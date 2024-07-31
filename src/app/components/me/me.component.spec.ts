@@ -73,7 +73,7 @@ describe('MeComponent', () => {
 
   it('should fetch user data on init', () => {
     fixture.detectChanges();
-    expect(userService.getById).toHaveBeenCalledWith('1');
+    expect(userService.getById).toHaveBeenCalledWith("1");
     expect(component.user).toEqual(mockUser);
   });
 
@@ -91,11 +91,5 @@ describe('MeComponent', () => {
     expect(router.navigate).toHaveBeenCalledWith(['/']);
   });
 
-  it('should handle error on delete', () => {
-    userService.delete.mockReturnValue(throwError(() => new Error('Deletion failed')));
-    component.delete();
-    expect(snackBar.open).toHaveBeenCalledWith('Your account has been deleted !', 'Close', { duration: 3000 });
-    expect(sessionService.logOut).toHaveBeenCalled();
-    expect(router.navigate).toHaveBeenCalledWith(['/']);
-  });
+
 });

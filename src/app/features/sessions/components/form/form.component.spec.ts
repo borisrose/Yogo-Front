@@ -10,7 +10,7 @@ import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { RouterTestingModule } from '@angular/router/testing';
 import { expect } from '@jest/globals';
-import { SessionService } from 'src/app/services/session.service';
+import { SessionService } from '../../../../services/session.service';
 import { SessionApiService } from '../../services/session-api.service';
 
 import { FormComponent } from './form.component';
@@ -23,7 +23,7 @@ describe('FormComponent', () => {
     sessionInformation: {
       admin: true
     }
-  } 
+  }
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
@@ -35,7 +35,7 @@ describe('FormComponent', () => {
         MatIconModule,
         MatFormFieldModule,
         MatInputModule,
-        ReactiveFormsModule, 
+        ReactiveFormsModule,
         MatSnackBarModule,
         MatSelectModule,
         BrowserAnimationsModule

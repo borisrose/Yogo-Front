@@ -10,9 +10,10 @@ import { MatButtonModule } from '@angular/material/button';
 import { of, throwError } from 'rxjs';
 import { LoginComponent } from './login.component';
 import { AuthService } from '../../services/auth.service';
-import { SessionService } from 'src/app/services/session.service';
-import { SessionInformation } from 'src/app/interfaces/sessionInformation.interface';
+import { SessionService } from '../../../../services/session.service';
+import { SessionInformation } from '../../../../interfaces/sessionInformation.interface';
 import { LoginRequest } from '../../interfaces/loginRequest.interface';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 describe('LoginComponent', () => {
   let component: LoginComponent;
@@ -42,6 +43,12 @@ describe('LoginComponent', () => {
       imports: [
         ReactiveFormsModule,
         HttpClientTestingModule,
+        MatButtonModule,
+        MatFormFieldModule,
+        MatCardModule,
+        MatInputModule,
+        MatIconModule,
+        BrowserAnimationsModule
       ],
       declarations: [LoginComponent],
       providers: [

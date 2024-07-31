@@ -1,5 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { of, throwError } from 'rxjs';
+import { of } from 'rxjs';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatCardModule } from '@angular/material/card';
@@ -8,13 +8,13 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { DetailComponent } from './detail.component';
-import { SessionInformation } from 'src/app/interfaces/sessionInformation.interface';
+import { SessionInformation } from '../../../../interfaces/sessionInformation.interface';
 import { SessionApiService } from '../../services/session-api.service';
-import { TeacherService } from 'src/app/services/teacher.service';
+import { TeacherService } from '../../../../services/teacher.service';
 import { Teacher } from '../../../../interfaces/teacher.interface';
-import { SessionService } from 'src/app/services/session.service';
+import { SessionService } from '../../../../services/session.service';
 import { Session } from '../../interfaces/session.interface';
-
+import { ReactiveFormsModule } from '@angular/forms';
 
 describe('DetailComponent', () => {
   let component: DetailComponent;
@@ -32,23 +32,24 @@ describe('DetailComponent', () => {
         MatButtonModule,
         MatIconModule,
         MatFormFieldModule,
-        MatInputModule
+        MatInputModule,
+        ReactiveFormsModule
       ],
       declarations: [ DetailComponent ],
       providers: [
         {
           provide: SessionApiService,
           useValue: {
-            detail: jest.fn(),
-            delete: jest.fn(),
-            participate: jest.fn(),
-            unParticipate: jest.fn()
+            detail: jest.fn().mockReturnValue(of({} as Session)),
+            delete: jest.fn().mockReturnValue(of({})),
+            participate: jest.fn().mockReturnValue(of(void 0)),
+            unParticipate: jest.fn().mockReturnValue(of(void 0))
           }
         },
         {
           provide: TeacherService,
           useValue: {
-            detail: jest.fn()
+            detail: jest.fn().mockReturnValue(of({} as Teacher))
           }
         },
         {
@@ -56,6 +57,7 @@ describe('DetailComponent', () => {
           useValue: {
             sessionInformation: {
               id: 1,
+              token: "1233",
               admin: true
             } as SessionInformation
           }
@@ -127,6 +129,7 @@ describe('DetailComponent', () => {
       jest.spyOn(teacherService, 'detail').mockReturnValue(of(mockTeacher));
 
       component.ngOnInit();
+      fixture.detectChanges();
 
       expect(sessionApiService.detail).toHaveBeenCalledWith('123');
       expect(teacherService.detail).toHaveBeenCalledWith('1');
@@ -142,40 +145,56 @@ describe('DetailComponent', () => {
       const snackBarSpy = jest.spyOn(matSnackBar, 'open');
 
       component.delete();
+      fixture.detectChanges();
 
       expect(sessionApiService.delete).toHaveBeenCalledWith('123');
-      expect(snackBarSpy).toHaveBeenCalledWith('Session deleted !', 'Close', { duration: 3000 });
+      expect(snackBarSpy).toHaveBeenCalledWith('Session deleted!', 'Close', { duration: 3000 });
       expect(navigateSpy).toHaveBeenCalledWith(['sessions']);
     });
   });
 
   describe('participate', () => {
     it('should call participate and update session details', () => {
-      jest.spyOn(sessionApiService, 'participate').mockReturnValue(of({}));
+      const mockSession: Session = {
+        id: 1,
+        name: 'Yoga Class',
+        description: 'Yoga session for beginners',
+        date: new Date(),
+        teacher_id: 1,
+        users: [1],
+        createdAt: new Date(),
+        updatedAt: new Date()
+      };
+
+      jest.spyOn(sessionApiService, 'participate').mockReturnValue(of(void 0));
       jest.spyOn(sessionApiService, 'detail').mockReturnValue(of({
-        ...component.session!,
+        ...mockSession,
         users: [1, 2]
-      } as Session));
+      }));
 
       component.participate();
+      fixture.detectChanges();
 
       expect(sessionApiService.participate).toHaveBeenCalledWith('123', '1');
-      expect(component.isParticipate).toBe(true);
+      expect(sessionApiService.detail).toHaveBeenCalledWith('123');
+      expect(component.session?.users).toContain(2);
     });
   });
 
   describe('unParticipate', () => {
     it('should call unParticipate and update session details', () => {
-      jest.spyOn(sessionApiService, 'unParticipate').mockReturnValue(of({}));
+      jest.spyOn(sessionApiService, 'unParticipate').mockReturnValue(of(void 0));
       jest.spyOn(sessionApiService, 'detail').mockReturnValue(of({
         ...component.session!,
         users: []
       } as Session));
 
       component.unParticipate();
+      fixture.detectChanges();
 
       expect(sessionApiService.unParticipate).toHaveBeenCalledWith('123', '1');
-      expect(component.isParticipate).toBe(false);
+      expect(sessionApiService.detail).toHaveBeenCalledWith('123');
+      expect(component.session?.users).toEqual([]);
     });
   });
 
@@ -183,6 +202,7 @@ describe('DetailComponent', () => {
     it('should navigate back in history', () => {
       const spy = jest.spyOn(window.history, 'back');
       component.back();
+      fixture.detectChanges();
       expect(spy).toHaveBeenCalled();
     });
   });

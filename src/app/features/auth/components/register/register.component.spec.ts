@@ -9,6 +9,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { RegisterComponent } from './register.component';
 import { AuthService } from '../../services/auth.service';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 describe('RegisterComponent', () => {
   let component: RegisterComponent;
@@ -19,7 +20,14 @@ describe('RegisterComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [
-        ReactiveFormsModule
+        ReactiveFormsModule,
+        MatButtonModule,
+        MatFormFieldModule,
+        MatSnackBarModule,
+        MatCardModule,
+        MatInputModule,
+        BrowserAnimationsModule
+
       ],
       declarations: [ RegisterComponent ],
       providers: [

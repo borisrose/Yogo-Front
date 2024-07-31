@@ -1,0 +1,101 @@
+describe('ngOnInit', () => {
+    it('should fetch session and teacher details', () => {
+      const mockSession: Session = {
+        id: 1,
+        name: 'Yoga Class',
+        description: 'Yoga session for beginners',
+        date: new Date(),
+        teacher_id: 1,
+        users: [1],
+        createdAt: new Date(),
+        updatedAt: new Date()
+      };
+
+      const mockTeacher: Teacher = {
+        id: 1,
+        firstName: 'John',
+        lastName: 'Doe',
+        createdAt: new Date(),
+        updatedAt: new Date()
+      };
+
+      jest.spyOn(sessionApiService, 'detail').mockReturnValue(of(mockSession));
+      jest.spyOn(teacherService, 'detail').mockReturnValue(of(mockTeacher));
+
+      component.ngOnInit();
+      fixture.detectChanges();
+
+      expect(sessionApiService.detail).toHaveBeenCalledWith('123');
+      expect(teacherService.detail).toHaveBeenCalledWith('1');
+      expect(component.session).toEqual(mockSession);
+      expect(component.teacher).toEqual(mockTeacher);
+    });
+  });
+
+  describe('delete', () => {
+    it('should delete session and navigate to sessions list', () => {
+      jest.spyOn(sessionApiService, 'delete').mockReturnValue(of({}));
+      const navigateSpy = jest.spyOn(router, 'navigate');
+      const snackBarSpy = jest.spyOn(matSnackBar, 'open');
+
+      component.delete();
+      fixture.detectChanges();
+
+      expect(sessionApiService.delete).toHaveBeenCalledWith('123');
+      expect(snackBarSpy).toHaveBeenCalledWith('Session deleted!', 'Close', { duration: 3000 });
+      expect(navigateSpy).toHaveBeenCalledWith(['sessions']);
+    });
+  });
+
+  describe('participate', () => {
+    it('should call participate and update session details', () => {
+      const mockSession: Session = {
+        id: 1,
+        name: 'Yoga Class',
+        description: 'Yoga session for beginners',
+        date: new Date(),
+        teacher_id: 1,
+        users: [1],
+        createdAt: new Date(),
+        updatedAt: new Date()
+      };
+
+      jest.spyOn(sessionApiService, 'participate').mockReturnValue(of(void 0));
+      jest.spyOn(sessionApiService, 'detail').mockReturnValue(of({
+        ...mockSession,
+        users: [1, 2]
+      }));
+
+      component.participate();
+      fixture.detectChanges();
+
+      expect(sessionApiService.participate).toHaveBeenCalledWith('123', '1');
+      expect(sessionApiService.detail).toHaveBeenCalledWith('123');
+      expect(component.session?.users).toContain(2);
+    });
+  });
+
+  describe('unParticipate', () => {
+    it('should call unParticipate and update session details', () => {
+      jest.spyOn(sessionApiService, 'unParticipate').mockReturnValue(of(void 0));
+      jest.spyOn(sessionApiService, 'detail').mockReturnValue(of({
+        ...component.session!,
+        users: []
+      } as Session));
+
+      component.unParticipate();
+      fixture.detectChanges();
+
+      expect(sessionApiService.unParticipate).toHaveBeenCalledWith('123', '1');
+      expect(sessionApiService.detail).toHaveBeenCalledWith('123');
+      expect(component.session?.users).toEqual([]);
+    });
+  });
+
+  describe('back', () => {
+    it('should navigate back in history', () => {
+      const spy = jest.spyOn(window.history, 'back');
+      component.back();
+      expect(spy).toHaveBeenCalled();
+    });
+  });
